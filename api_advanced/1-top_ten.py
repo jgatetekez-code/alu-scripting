@@ -1,66 +1,31 @@
 #!/usr/bin/python3
-"""Query the Reddit API and print the first 10 hot posts."""
-
-import os
+"""Module that queries the Reddit API for a subreddit's hot posts."""
 import requests
 
 
 def top_ten(subreddit):
-    """Print the titles of the first 10 hot posts."""
-    client_id = os.environ.get("REDDIT_CLIENT_ID")
-    client_secret = os.environ.get("REDDIT_CLIENT_SECRET")
+    """Print the titles of the first 10 hot posts of a subreddit.
 
-    if not client_id or not client_secret or not subreddit:
+    Prints None if the subreddit is invalid.
+    """
+    if subreddit is None or not isinstance(subreddit, str):
         print(None)
         return
 
-    headers = {
-        "User-Agent": "ALUStudent:top_ten:v1.0"
-    }
-
-    token_url = "https://www.reddit.com/api/v1/access_token"
+    url = "https://www.reddit.com/r/{}/hot.json".format(subreddit)
+    headers = {"User-Agent": "linux:top_ten:v1.0.0 (by /u/your_username)"}
+    params = {"limit": 10}
 
     try:
-        token_response = requests.post(
-            token_url,
-            auth=(client_id, client_secret),
-            data={"grant_type": "client_credentials"},
-            headers=headers,
-            allow_redirects=False,
-            timeout=10
-        )
-
-        if token_response.status_code != 200:
-            print(None)
-            return
-
-        access_token = token_response.json().get("access_token")
-
-        if not access_token:
-            print(None)
-            return
-
-        headers["Authorization"] = "Bearer {}".format(access_token)
-
-        url = "https://oauth.reddit.com/r/{}/hot".format(subreddit)
-
-        response = requests.get(
-            url,
-            headers=headers,
-            params={"limit": 10},
-            allow_redirects=False,
-            timeout=10
-        )
-
+        response = requests.get(url, headers=headers, params=params,
+                                allow_redirects=False, timeout=10)
         if response.status_code != 200:
             print(None)
             return
-
         posts = response.json().get("data", {}).get("children", [])
-
-        for post in posts[:10]:
-            print(post.get("data", {}).get("title"))
-
     except (requests.RequestException, ValueError):
         print(None)
+        return
 
+    for post in posts:
+        print(post.get("data", {}).get("title"))

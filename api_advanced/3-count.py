@@ -65,4 +65,4 @@ def count_words(subreddit, word_list, after=None, counts=None,
 
     except (requests.RequestException, ValueError):
         return
-
+    

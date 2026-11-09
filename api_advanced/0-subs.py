@@ -4,6 +4,7 @@
 import os
 import requests
 
+
 def number_of_subscribers(subreddit):
     """Return the total number of subscribers for a subreddit."""
     client_id = os.environ.get("REDDIT_CLIENT_ID")
@@ -55,4 +56,3 @@ def number_of_subscribers(subreddit):
 
     except (requests.RequestException, ValueError):
         return 0
-
